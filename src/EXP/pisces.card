@@ -1,0 +1,111 @@
+[Compatibility]
+libIGCM=1.0
+
+[UserChoices]
+version=v3.6_stable
+Offline_Mode=y
+Co2Anthr=n
+PisFreq=4
+AtmCo2=2.8432e+02
+OutputLevel=10
+#==================================================================================================
+
+R_DYN=
+
+[InitialStateFiles]
+List= ()
+
+[BoundaryFiles]
+List= ()
+
+ListNonDel= ()
+
+
+[ParametersFiles]
+List=   (${MODIPSL}/modeles/NEMOGCM/CONFIG/SHARED/namelist_ref                                    , namelist_ref                  ), \
+        (${MODIPSL}/modeles/NEMOGCM/CONFIG/SHARED/namelist_top_ref                                , namelist_top_ref              ), \
+        (${MODIPSL}/modeles/NEMOGCM/CONFIG/SHARED/namelist_pisces_ref                             , namelist_pisces_ref           ), \
+        (${MODIPSL}/modeles/NEMOGCM/CONFIG/ORCA1_OFF_PISCES/EXP00/context_nemo.xml                , context_nemo.xml              ), \
+        (${MODIPSL}/modeles/NEMOGCM/CONFIG/ORCA1_OFF_PISCES/EXP00/domain_def_nemo.xml             , domain_def_nemo.xml           ), \
+        (${MODIPSL}/modeles/NEMOGCM/CONFIG/ORCA1_OFF_PISCES/EXP00/axis_def_nemo.xml               , axis_def_nemo.xml             ), \
+        (${MODIPSL}/modeles/NEMOGCM/CONFIG/ORCA1_OFF_PISCES/EXP00/grids_def_nemo.xml              , grids_def_nemo.xml            ), \
+        (${MODIPSL}/modeles/NEMOGCM/CONFIG/ORCA1_OFF_PISCES/EXP00/field_def_nemo-opa.xml          , field_def_nemo-opa.xml        ), \
+        (${SUBMIT_DIR}/PARAM/XML/field_def_nemo-pisces.xml                                        , field_def_nemo-pisces.xml     ), \
+        (${MODIPSL}/modeles/NEMOGCM/CONFIG/ORCA1_OFF_PISCES/EXP00/field_def_nemo-inerttrc.xml     , field_def_nemo-inerttrc.xml   ), \
+        (${SUBMIT_DIR}/PARAM/NAMELIST/${RESOL_OCE}/namelist_offline_${exptype}_cfg                , namelist_cfg                  ), \
+        (${SUBMIT_DIR}/PARAM/NAMELIST/${RESOL_OCE}/namelist_top_cfg                               , namelist_top_cfg              ), \
+        (${SUBMIT_DIR}/PARAM/NAMELIST/namelist_pisces_cfg                                         , namelist_pisces_cfg           ), \
+        (${SUBMIT_DIR}/PARAM/XML/iodef.xml                                                        , iodef.xml                     ), \
+        (${SUBMIT_DIR}/PARAM/XML/file_def_nemo-pisces_offline.xml                                 , file_def_nemo-pisces.xml      )
+
+
+
+[RestartFiles]
+List=   (${config_UserChoices_JobName}_${NEMO_END}_restart_trc.nc,  restart_trc.nc, restart_trc.nc)
+
+[OutputText]
+List=   (ocean.output, namelist_top_ref, namelist_top_cfg, namelist_pisces_ref, namelist_pisces_cfg, tracer.stat)
+
+[OutputFiles]
+List=   (${config_UserChoices_JobName}_1y_ptrc_T.nc        , ${R_OUT_MBG_O_Y}/${PREFIX}_1Y_ptrc_T.nc    , NONE   ) , \
+        (${config_UserChoices_JobName}_1y_diad_T.nc        , ${R_OUT_MBG_O_Y}/${PREFIX}_1Y_diad_T.nc    , NONE   ) , \
+	(${config_UserChoices_JobName}_1y_bioscalar.nc     , ${R_OUT_MBG_O_Y}/${PREFIX}_1Y_bioscalar.nc , NONE   ) , \
+	(${config_UserChoices_JobName}_1m_bioscalar.nc     , ${R_OUT_MBG_O_M}/${PREFIX}_1M_bioscalar.nc , Post_1M_bioscalar) , \
+        (${config_UserChoices_JobName}_1m_ptrc_T.nc        , ${R_OUT_MBG_O_M}/${PREFIX}_1M_ptrc_T.nc    , Post_1M_ptrc_T   ) , \
+        (${config_UserChoices_JobName}_1m_diad_T.nc        , ${R_OUT_MBG_O_M}/${PREFIX}_1M_diad_T.nc    , Post_1M_diad_T   ) , \
+	(${config_UserChoices_JobName}_1d_bioscalar.nc     , ${R_OUT_MBG_O_D}/${PREFIX}_1D_bioscalar.nc , NONE)
+
+
+[Post_1D_bioscalar]
+Patches = ()
+GatherWithInternal = (time_counter, time_instant, time_instant_bounds)
+TimeSeriesVars2D = (pno3tot, ppo4tot, psiltot, palktot, pfertot, tcflx, tcflxcum, tcexp, tintpp, tnfix, tdenit)
+ChunckJob2D = NONE
+TimeSeriesVars3D = ()
+ChunckJob3D = NONE
+Seasonal=OFF
+
+[Post_1M_bioscalar]
+Patches = ()
+GatherWithInternal = (time_counter, time_instant, time_instant_bounds)
+TimeSeriesVars2D = (pno3tot, ppo4tot, psiltot, palktot, pfertot, tcflx, tcflxcum, tcexp, tintpp, tnfix, tdenit)
+ChunckJob2D = NONE
+TimeSeriesVars3D = ()
+ChunckJob3D = NONE
+Seasonal=OFF
+
+[Post_1M_ptrc_T]
+Patches = ()
+GatherWithInternal = (nav_lon, nav_lat, deptht, time_counter, time_centered, time_centered_bounds)
+TimeSeriesVars2D = ()
+ChunckJob2D = 50Y
+TimeSeriesVars3D = (Alkalini, NCHL, DCHL, DIC, Fer, NO3, O2, PO4, Si)
+ChunckJob3D = 50Y
+Seasonal=ON
+
+[Post_1M_diad_T]
+Patches = ()
+GatherWithInternal = (nav_lon, nav_lat, deptht, time_counter, time_centered, time_centered_bounds)
+TimeSeriesVars2D = (Cflx, Dpco2, EPC100, INTPP)
+ChunckJob2D = 50Y
+TimeSeriesVars3D = (TPP)
+ChunckJob3D = 50Y
+Seasonal=ON
+
+[Post_1Y_ptrc_T]
+Patches = ()
+GatherWithInternal = (nav_lon, nav_lat, deptht, time_counter, time_centered, time_centered_bounds)
+TimeSeriesVars2D = ()
+ChunckJob2D = OFF
+TimeSeriesVars3D = (Alkalini, NCHL, DCHL, DIC, Fer, NO3, O2, PO4, Si, POC, GOC, DOC)
+ChunckJob3D = NONE
+Seasonal=OFF
+
+[Post_1Y_diad_T]
+Patches = ()
+GatherWithInternal = (nav_lon, nav_lat, deptht, time_counter, time_centered, time_centered_bounds)
+TimeSeriesVars2D = (Cflx, Dpco2, EPC100, Heup,  Nfix)
+ChunckJob2D = 50Y
+TimeSeriesVars3D = (PAR, TPP)
+ChunckJob3D = 50Y
+Seasonal=OFF

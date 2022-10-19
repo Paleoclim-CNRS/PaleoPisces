@@ -1,0 +1,249 @@
+    <!-- $id$ -->
+    
+    <!-- 
+
+============================================================================================================
+=                                           output files definition                                        =
+=                                            Define your own files ocean biogeochemistry                                         =
+=                                         put the variables you want...                                    =
+============================================================================================================
+    -->
+    
+    <file_definition type="one_file" name="@expname@_@freq@" sync_freq="1d" min_digits="4" >
+   
+      <file_group id="1ts_pis" output_freq="1ts"  output_level="10" enabled=".TRUE."/> <!-- 1 time step files -->
+      <file_group id="1h_pis" output_freq="1h"  output_level="10" enabled=".TRUE."/> <!-- 1h files -->
+      <file_group id="2h_pis" output_freq="2h"  output_level="10" enabled=".TRUE."/> <!-- 2h files -->
+      <file_group id="3h_pis" output_freq="3h"  output_level="10" enabled=".TRUE."/> <!-- 3h files -->     
+      <file_group id="4h_pis" output_freq="4h"  output_level="10" enabled=".TRUE."/> <!-- 4h files -->
+      <file_group id="6h_pis" output_freq="6h"  output_level="10" enabled=".TRUE."/> <!-- 6h files -->     
+      <file_group id="1d_pis" output_freq="1d"  output_level="_AUTO_" enabled="_AUTO_" >  <!-- 1d files -->   
+ 
+        <file id="file20" name_suffix="_bioscalar" description="pisces sms variables" >
+          <field field_ref="tdenit"   name="tdenit"   grid_ref="grid_1point" unit="TgN/yr" operation="instant" > tdenit * 14. * 86400. * 365. / 1e12 </field>
+          <field field_ref="tnfix"    name="tnfix"    grid_ref="grid_1point" unit="TgN/yr" operation="instant" > tnfix * 14. * 86400. * 365. / 1e12 </field>
+          <field field_ref="tcflx"    name="tcflx"    grid_ref="grid_1point" unit="PgC/yr" operation="instant" > tcflx * -1. * 12. * 86400. * 365. / 1e15 </field>
+          <field field_ref="tcflxcum" name="tcflxcum" grid_ref="grid_1point" unit="PgC"    operation="instant" > tcflxcum * -1. * 12. / 1e15 </field>
+          <field field_ref="tcexp"    name="tcexp"    grid_ref="grid_1point" unit="PgC/yr" operation="instant" > tcexp * 12. * 86400. * 365. / 1e15 </field>
+          <field field_ref="tintpp"   name="tintpp"   grid_ref="grid_1point" unit="PgC/yr" operation="instant" > tintpp * 12. * 86400. * 365. / 1e15 </field>
+          <field field_ref="pno3tot"  name="pno3tot"  grid_ref="grid_1point" unit="umolN"  operation="instant" > pno3tot * 16. / 122. * 1e6 </field>
+          <field field_ref="ppo4tot"  name="ppo4tot"  grid_ref="grid_1point" unit="umolP"  operation="instant" > ppo4tot * 1. / 122. * 1e6 </field>
+          <field field_ref="psiltot"  name="psiltot"  grid_ref="grid_1point" unit="umolC"  operation="instant" > psiltot * 1e6  </field>
+          <field field_ref="palktot"  name="palktot"  grid_ref="grid_1point" unit="umolC"  operation="instant" > palktot * 1e6  </field>
+          <field field_ref="pfertot"  name="pfertot"  grid_ref="grid_1point" unit="nmolFe" operation="instant" > pfertot * 1e9  </field>
+        </file>
+
+      </file_group> 
+
+      <file_group id="5d_pis" output_freq="5d"  output_level="10" enabled="_AUTO_"/>  <!-- 5d files -->   
+	
+      <file_group id="1m_pis" output_freq="1mo" output_level="_AUTO_" enabled="_AUTO_"> <!-- real monthly files -->
+
+       <file id="file21" name_suffix="_ptrc_T" description="pisces sms variables" >
+          <field field_ref="DIC"       name="DIC"     />
+          <field field_ref="Alkalini"  name="Alkalini" />
+          <field field_ref="O2"        name="O2"      />
+          <field field_ref="CaCO3"     name="CaCO3"   />
+          <field field_ref="PO4"       name="PO4"     />
+          <field field_ref="POC"       name="POC"     />
+          <field field_ref="Si"        name="Si"      /> 
+          <field field_ref="PHY"       name="PHY"     />
+          <field field_ref="ZOO"       name="ZOO"     />
+          <field field_ref="DOC"       name="DOC"     />
+          <field field_ref="PHY2"      name="PHY2"    />
+          <field field_ref="ZOO2"      name="ZOO2"    />
+          <field field_ref="DSi"       name="DSi"     />
+          <field field_ref="Fer"       name="Fer"     />
+          <field field_ref="BFe"       name="BFe"     />
+          <field field_ref="GOC"       name="GOC"     />
+          <field field_ref="SFe"       name="SFe"     />
+          <field field_ref="DFe"       name="DFe"     />
+          <field field_ref="GSi"       name="GSi"     />
+          <field field_ref="NFe"       name="NFe"     />
+          <field field_ref="NCHL"      name="NCHL"    />
+          <field field_ref="DCHL"      name="DCHL"    />
+          <field field_ref="NO3"       name="NO3"     />
+          <field field_ref="NH4"       name="NH4"     />
+    </file>
+
+   <file id="file22" name_suffix="_diad_T" description="additional pisces diagnostics" >
+        <field field_ref="PH"         name="PH" />
+        <field field_ref="CO3"        name="CO3" />
+        <field field_ref="CO3sat"     name="CO3sat" />
+        <field field_ref="PAR"        name="PAR"   />
+        <field field_ref="PCAL"       name="PCAL"   />
+        <field field_ref="Cflx"       name="Cflx"  />
+        <field field_ref="Oflx"       name="Oflx"  />
+        <field field_ref="Dpco2"      name="Dpco2"   />
+        <field field_ref="Dpo2"       name="Dpo2"   />
+        <field field_ref="Heup"      name="Heup"  />
+        <field field_ref="Irondep"   name="Irondep"  />
+        <field field_ref="Ironsed"   name="Ironsed"  />
+        <field field_ref="Nfix"      name="Nfix"  />
+        <field field_ref="LNnut"     name="LNnut"  />
+        <field field_ref="LDnut"     name="LDnut"  />
+        <field field_ref="LNFe"      name="LNFe"  />
+        <field field_ref="LDFe"      name="LDFe"  />
+        <field field_ref="LNlight"   name="LNlight"  />
+        <field field_ref="LDlight"   name="LDlight"  />
+        <field field_ref="TPP"       name="TPP"  />
+        <field field_ref="INTPP"     name="INTPP"  />
+        <field field_ref="INTPNEW"     name="INTPNEW"  />
+        <field field_ref="TPNEW"      name="TPNEW"  />
+        <field field_ref="EPC100"    name="EPC100"  />
+        <field field_ref="EXPC"      name="EXPC"  />
+        <field field_ref="EPFE100"   name="EPFE100"  />
+        <field field_ref="EPSI100"   name="EPSI100"  />
+        <field field_ref="EPCAL100"  name="EPCAL100"  />
+        <field field_ref="ALKriv"  name="ALKriv"  />
+        <field field_ref="DICriv"  name="DICriv"  />
+        <field field_ref="DINriv"  name="DINriv"  />
+        <field field_ref="DIPriv"  name="DIPriv"  />
+        <field field_ref="DSIriv"  name="DSIriv"  />
+        <field field_ref="rnfmsk"  name="rnfmsk"  />
+        <field field_ref="runoff"  name="runoff"  />
+        <field field_ref="h_rnf"  name="h_rnf"  />
+        <field field_ref="area_T"  name="area_T"  />
+        <field field_ref="PPPHY"      name="PPPHY"   />
+        <field field_ref="PPPHY2"     name="PPPHY2"  />
+        <field field_ref="REMIN"      name="REMIN"   />
+        <field field_ref="DENIT"      name="DENIT"   />
+        <field field_ref="SedC"       name="SedC"    /> 
+        <field field_ref="Sidep"   name="Sidep"  />
+        <field field_ref="Pdep"   name="Pdep"  />
+        <field field_ref="Ndep"   name="Ndep"  />
+        <field field_ref="GRAZ1"        name="GRAZ1"  />
+        <field field_ref="GRAZ2"        name="GRAZ2"  />    
+
+
+</file>
+
+
+      <file id="file23" name_suffix="_bioscalar" description="pisces sms variables" >
+          <field field_ref="tdenit"   name="tdenit"   grid_ref="grid_1point" unit="TgN/yr" operation="instant" > tdenit * 14. * 86400. * 365. / 1e12 </field>
+          <field field_ref="tnfix"    name="tnfix"    grid_ref="grid_1point" unit="TgN/yr" operation="instant" > tnfix * 14. * 86400. * 365. / 1e12 </field>
+          <field field_ref="tcflx"    name="tcflx"    grid_ref="grid_1point" unit="PgC/yr" operation="instant" > tcflx * -1. * 12. * 86400. * 365. / 1e15 </field>
+          <field field_ref="tcflxcum" name="tcflxcum" grid_ref="grid_1point" unit="PgC"    operation="instant" > tcflxcum * -1. * 12. / 1e15 </field>
+          <field field_ref="tcexp"    name="tcexp"    grid_ref="grid_1point" unit="PgC/yr" operation="instant" > tcexp * 12. * 86400. * 365. / 1e15 </field>
+          <field field_ref="tintpp"   name="tintpp"   grid_ref="grid_1point" unit="PgC/yr" operation="instant" > tintpp * 12. * 86400. * 365. / 1e15 </field>
+          <field field_ref="pno3tot"  name="pno3tot"  grid_ref="grid_1point" unit="umolN"  operation="instant" > pno3tot * 16. / 122. * 1e6 </field>
+          <field field_ref="ppo4tot"  name="ppo4tot"  grid_ref="grid_1point" unit="umolP"  operation="instant" > ppo4tot * 1. / 122. * 1e6 </field>
+          <field field_ref="psiltot"  name="psiltot"  grid_ref="grid_1point" unit="umolC"  operation="instant" > psiltot * 1e6  </field>
+          <field field_ref="palktot"  name="palktot"  grid_ref="grid_1point" unit="umolC"  operation="instant" > palktot * 1e6  </field>
+          <field field_ref="pfertot"  name="pfertot"  grid_ref="grid_1point" unit="nmolFe" operation="instant" > pfertot * 1e9  </field>
+        </file>
+
+
+      </file_group>
+
+      <file_group id="2m_pis" output_freq="2mo" output_level="10" enabled=".TRUE."/> <!-- real 2m files -->
+      <file_group id="3m_pis" output_freq="3mo" output_level="10" enabled=".TRUE."/> <!-- real 3m files -->
+      <file_group id="4m_pis" output_freq="4mo" output_level="10" enabled=".TRUE."/> <!-- real 4m files -->
+      <file_group id="6m_pis" output_freq="6mo" output_level="10" enabled=".TRUE."/> <!-- real 6m files -->
+
+
+      <file_group id="1y_pis"  output_freq="1y" output_level="_AUTO_" enabled="_AUTO_"> <!-- real yearly files -->
+
+ 
+       <file id="file24" name_suffix="_ptrc_T" description="pisces sms variables" >
+          <field field_ref="DIC"       name="DIC"     />
+          <field field_ref="Alkalini"  name="Alkalini" />
+          <field field_ref="O2"        name="O2"      />
+          <field field_ref="CaCO3"     name="CaCO3"   />
+          <field field_ref="PO4"       name="PO4"     />
+          <field field_ref="POC"       name="POC"     />
+          <field field_ref="Si"        name="Si"      /> 
+          <field field_ref="PHY"       name="PHY"     />
+          <field field_ref="ZOO"       name="ZOO"     />
+          <field field_ref="DOC"       name="DOC"     />
+          <field field_ref="PHY2"      name="PHY2"    />
+          <field field_ref="ZOO2"      name="ZOO2"    />
+          <field field_ref="DSi"       name="DSi"     />
+          <field field_ref="Fer"       name="Fer"     />
+          <field field_ref="BFe"       name="BFe"     />
+          <field field_ref="GOC"       name="GOC"     />
+          <field field_ref="SFe"       name="SFe"     />
+          <field field_ref="DFe"       name="DFe"     />
+          <field field_ref="GSi"       name="GSi"     />
+          <field field_ref="NFe"       name="NFe"     />
+          <field field_ref="NCHL"      name="NCHL"    />
+          <field field_ref="DCHL"      name="DCHL"    />
+          <field field_ref="NO3"       name="NO3"     />
+          <field field_ref="NH4"       name="NH4"     />
+    </file>
+
+   <file id="file25" name_suffix="_diad_T" description="additional pisces diagnostics" >
+        <field field_ref="PH"         name="PH" />
+        <field field_ref="CO3"        name="CO3" />
+        <field field_ref="CO3sat"     name="CO3sat" />
+        <field field_ref="PAR"        name="PAR"   />
+        <field field_ref="PCAL"       name="PCAL"   />
+        <field field_ref="Cflx"       name="Cflx"  />
+        <field field_ref="Oflx"       name="Oflx"  />
+        <field field_ref="Dpco2"      name="Dpco2"   />
+        <field field_ref="Dpo2"       name="Dpo2"   />
+        <field field_ref="Heup"      name="Heup"  />
+        <field field_ref="Irondep"   name="Irondep"  />
+        <field field_ref="Ironsed"   name="Ironsed"  />
+        <field field_ref="Nfix"      name="Nfix"  />
+        <field field_ref="LNnut"     name="LNnut"  />
+        <field field_ref="LDnut"     name="LDnut"  />
+        <field field_ref="LNFe"      name="LNFe"  />
+        <field field_ref="LDFe"      name="LDFe"  />
+        <field field_ref="LNlight"   name="LNlight"  />
+        <field field_ref="LDlight"   name="LDlight"  />
+        <field field_ref="TPP"       name="TPP"  />
+        <field field_ref="INTPP"     name="INTPP"  />
+        <field field_ref="INTPNEW"     name="INTPNEW"  />
+        <field field_ref="TPNEW"      name="TPNEW"  />
+        <field field_ref="EPC100"    name="EPC100"  />
+        <field field_ref="EPFE100"   name="EPFE100"  />
+        <field field_ref="EPSI100"   name="EPSI100"  />
+        <field field_ref="EPCAL100"  name="EPCAL100"  />
+        <field field_ref="EXPC"      name="EXPC"  />
+        <field field_ref="xfracal"   name="xfracal"  />
+        <field field_ref="ALKriv"  name="ALKriv"  />
+        <field field_ref="DICriv"  name="DICriv"  />
+        <field field_ref="DINriv"  name="DINriv"  />
+        <field field_ref="DIPriv"  name="DIPriv"  />
+        <field field_ref="DSIriv"  name="DSIriv"  />
+        <field field_ref="rnfmsk"  name="rnfmsk"  />
+        <field field_ref="runoff"  name="runoff"  />
+        <field field_ref="h_rnf"  name="h_rnf"  />
+        <field field_ref="area_T"  name="area_T"  />
+        <field field_ref="PPPHY"      name="PPPHY"  />
+        <field field_ref="PPPHY2"     name="PPPHY2" />
+        <field field_ref="REMIN"      name="REMIN"  />
+        <field field_ref="DENIT"      name="DENIT"  />
+        <field field_ref="SedC"       name="SedC"   />
+        <field field_ref="Sidep"   name="Sidep"  />
+        <field field_ref="Pdep"   name="Pdep"  />
+        <field field_ref="Ndep"   name="Ndep"  />
+        </file>
+
+      <file id="file26" name_suffix="_bioscalar" description="pisces sms variables" >
+          <field field_ref="tdenit"   name="tdenit"   grid_ref="grid_1point" unit="TgN/yr" operation="instant" > tdenit * 14. * 86400. * 365. / 1e12 </field>
+          <field field_ref="tnfix"    name="tnfix"    grid_ref="grid_1point" unit="TgN/yr" operation="instant" > tnfix * 14. * 86400. * 365. / 1e12 </field>
+          <field field_ref="tcflx"    name="tcflx"    grid_ref="grid_1point" unit="PgC/yr" operation="instant" > tcflx * -1. * 12. * 86400. * 365. / 1e15 </field>
+          <field field_ref="tcflxcum" name="tcflxcum" grid_ref="grid_1point" unit="PgC"    operation="instant" > tcflxcum * -1. * 12. / 1e15 </field>
+          <field field_ref="tcexp"    name="tcexp"    grid_ref="grid_1point" unit="PgC/yr" operation="instant" > tcexp * 12. * 86400. * 365. / 1e15 </field>
+          <field field_ref="tintpp"   name="tintpp"   grid_ref="grid_1point" unit="PgC/yr" operation="instant" > tintpp * 12. * 86400. * 365. / 1e15 </field>
+          <field field_ref="pno3tot"  name="pno3tot"  grid_ref="grid_1point" unit="umolN"  operation="instant" > pno3tot * 16. / 122. * 1e6 </field>
+          <field field_ref="ppo4tot"  name="ppo4tot"  grid_ref="grid_1point" unit="umolP"  operation="instant" > ppo4tot * 1. / 122. * 1e6 </field>
+          <field field_ref="psiltot"  name="psiltot"  grid_ref="grid_1point" unit="umolC"  operation="instant" > psiltot * 1e6  </field>
+          <field field_ref="palktot"  name="palktot"  grid_ref="grid_1point" unit="umolC"  operation="instant" > palktot * 1e6  </field>
+          <field field_ref="pfertot"  name="pfertot"  grid_ref="grid_1point" unit="nmolFe" operation="instant" > pfertot * 1e9  </field>
+    </file>
+
+       <file id="file27" name_suffix="_age" description="Age Inert tracer" >
+          <field field_ref="Age"       name="Age" />
+      </file>
+
+      </file_group>
+
+      <file_group id="2y_pis"  output_freq="2y" output_level="10" enabled=".TRUE."/> <!-- real 2y files -->
+      <file_group id="5y_pis"  output_freq="5y" output_level="10" enabled=".TRUE."/> <!-- real 5y files -->
+      <file_group id="10y_pis" output_freq="10y" output_level="10" enabled=".TRUE."/> <!-- real 10y files -->
+
+   </file_definition>
+

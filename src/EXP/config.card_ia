@@ -1,0 +1,110 @@
+# $Id$
+# This is config.card file for restart with an NEW libIGCM simulation tree.
+# This is config.card file for NEMO ORCA1_LIM3_PISCES configuration
+#
+#========================================================================
+#D-- Compatibility -
+[Compatibility]
+libIGCM=1.0
+#D-- UserChoices -
+[UserChoices]
+#============================
+#-- (<8 chars MAX for JobName)
+JobName=
+#----- Short Name of Experiment
+ExperimentName=ORCA2ia
+#----- DEVT TEST PROD
+SpaceName=PROD
+LongName="ORCA2_OFF_PISCES NEMO configuration"
+TagName=ORCA2_OFF_PISCES
+#D- Choice of experiment in EXPERIEMENTS directory
+ExpType=ORCA2_OFF_PISCES/ia
+#============================
+#-- leap, noleap, 360d
+CalendarType=360d
+#-- Begin and end of Job
+#-- "YYYY-MM-DD"
+DateBegin=
+DateEnd=
+#============================
+#-- 1Y, 1M, 5D, 1D
+PeriodLength=1Y
+#============================
+# config.card configuration options :
+#R_BC=$WORKDIR/../../gzi/rgzi002/IGCM/BC
+#R_INIT=$WORKDIR/../../gzi/rgzi002/IGCM/BC
+#========================================================================
+#D-- ListOfComponents -
+[ListOfComponents]
+#D- For each component, Name of component, Tag of component
+MBG= (pisces, PISCES)
+#========================================================================
+#D-- Executable -
+[Executable]
+Name=nemo
+#D- For each component, Real name of executable
+MBG= (orca2offpiscesv5.exe, nemo, 96MPI)
+#========================================================================
+#D-- Restarts -
+[Restarts]
+#D- by default: config.card describes no restart for all components
+#D-             ie start from Levitus or limit files
+#D- If you want to restart all components from the same simulation,
+#D-      put OveRule flag to 'y' and set the next 3 parameters
+OverRule=n
+#D- Last day of the experience used as restart
+RestartDate=2000-12-31
+#D- Define restart simulation name
+RestartJobName=PISCES
+#D- Path Server Group Login
+RestartPath=${ARCHIVE}/IGCM_OUT/ORCA2_OFF_PISCES/DEVT/ORCA2clim
+
+#========================================================================
+#D-- MBG -
+[MBG]
+WriteFrequency="1M 1Y"
+Restart= n
+##-- Last day of the experience used as restart
+RestartDate=2000-12-31
+# Define restart simulation name
+RestartJobName=OR2LP1
+RestartPath=${ARCHIVE}/IGCM_OUT/ORCA2_LIM2_PISCES
+# Old component name for restart (if empty, use new name)
+OldName=
+
+#========================================================================
+#D-- Post -
+[Post]
+ParserXIOS=FALSE
+#D- Do we pack restart and debug txt files, this flag determines
+#D- frequency of pack submission (use NONE for DRYRUN=3)
+PackFrequency=10Y
+#D- To have only the last period in RESTART/*.tar : save 90% of volume.
+#D- TRUE to be effective (nothing by default)
+LightRestartPack=TRUE
+#D- If you want to produce time series, this flag determines
+#D- frequency of post-processing submission (NONE if you dont want)
+TimeSeriesFrequency=NONE
+#D- If you want to produce seasonal average, this flag determines
+#D- the period of this average (NONE if you dont want)
+SeasonalFrequency=100Y
+#D- If you want to produce compute PCMDI metrics from seasonal average
+#D- Set FALSE to deactivate the metrics computation.
+MetricsPCMDI=FALSE
+#D- Offset for seasonal average first start dates ; same unit as SeasonalFrequency
+#D- Usefull if you do not want to consider the first X simulations years
+SeasonalFrequencyOffset=0
+
+#========================================================================
+#D-- IOS -
+[IOS]
+WriteFrequency=""
+# If config_Restarts_OverRule == 'n' next 4 params are read
+Restart= n
+##-- Last day of the experience used as restart for this component if Restart=y
+RestartDate=1899-12-31
+# Define restart simulation name for this component
+RestartJobName=EXP00
+RestartPath=${ARCHIVE}/IGCM_OUT/IPSLCM5A/DEVT/piControl
+# Old component name for restart (if empty, use new name)
+OldName=
