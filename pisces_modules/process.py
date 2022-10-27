@@ -109,8 +109,11 @@ class PaleoPiscesInstaller():
         """
         Load nemo, version is specified when instantiating PaleoPiscesInstaller class
         (see install_paleo_pisces.py).
-        Use of subprocess.Popen instead of subprocess.run in order to get realtime output
-        by using subprocess.Popen in tandem with the Popen.poll method
+        subprocess.Popen can be used instead of subprocess.run in order to print realtime output
+        by using it in tandem with the Popen.poll method. Output to display can be filtered
+        with if condition (check example code below `if 'username' in out_str...`).
+        This is useful if the shell command require a username or a password to enter 
+        (you wont be able to see the request with subprocess.run...).
         code:
             result = subprocess.Popen(
             ['./model', self.nemo],
@@ -122,18 +125,9 @@ class PaleoPiscesInstaller():
                 out_str = result.stdout.readline().strip().decode("utf-8")
                 if result.poll() is not None:
                     break
-                if '?' in out_str:
+                if 'username' in out_str or 'password' in out_str:
                     print(out_str)
             result.wait()
-
-        result = subprocess.run(
-            ['./model', self.nemo],
-            cwd=os.path.join(self.pisces_path, 'modipsl', 'util'),
-            input=f'{self.icmc_username}\n{self.icmc_password}\n',
-            capture_output=True,
-            text=True,
-            check=True
-        )
         """
         print(f'\n Loading {color["BLUE"]}{self.nemo}{color["END"]}...', end=" ", flush=True)
 
