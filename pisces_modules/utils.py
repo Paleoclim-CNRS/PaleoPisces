@@ -69,37 +69,65 @@ class PathChecker():
         return self._full_path
 
 
-def path_checker(path, folder, folder_exist=True):
+def path_checker(path, elem, existence=True, isfile=False, mod_param=None):
     """
-    Prompts WARNING if folder already exists or not depending on folder_exist flag
-        If folder_exist = True: warning will be displayed if folder exists
-        If folder_exist = False: warning will be displayed if folder doesn't exist
-    If warnnig is displayed, user will be prompted to enter another folder name or quit
+    Prompts WARNING if path/folder or path/file already exists or not depending on 
+    - existence flag
+        If existence = True: warning will be displayed if folder already exists
+        If existence = False: warning will be displayed if folder doesn't exist
+    - isfile flag
+        If isfile = True: function will check for path/file
+        If isfile = False: function will check for path/folder
+    If warnnig is displayed, user will be prompted to enter another folder/file name or quit
+    mod_param should be defined in list of 2 elements:
+        - Path to the param file to correct
+        - Variable to modify (under format 'var = ')
+    If mod_param is defined, variable (mod_param[1]) in param file (mod_param[0]) will be
+    modified with the right folder name choosen by user
     """
-    if folder == '':
-        folder = '__Null__'
-    full_path = os.path.join(path, folder)
-    if folder_exist:
+    if elem == '':
+        elem = '__Null__'
+    full_path = os.path.join(path, elem)
+    if existence:
         def condition(path):
-            return os.path.isdir(path)
-        str_elem = 'already exists'
+            if not isfile:
+                return os.path.isdir(path)
+            if isfile:
+                return os.path.isfile(path)
+        str_2 = 'already exists'
     else:
         def condition(path):
-            return not os.path.isdir(path)
-        str_elem = 'does not exist'
+            if not isfile:
+                return not os.path.isdir(path)
+            if isfile:
+                return not os.path.isfile(path)
+        str_2 = 'does not exist'
+
+    if isfile:
+        str_1 = 'File'
+    elif not isfile:
+        str_1 = 'Folder'
+
+    wit = False
     while True:
-        if folder.casefold() == 'q':
+        if elem.casefold() == 'q':
             sys.exit(f'\n{color["RED"]}[PROGRAM EXITED]{color["END"]}\n')
         elif condition(full_path):
-            prpt = (f'\n {str_infos["warning"]} Folder '
-                f'{color["YELLOW"]}{folder}{color["END"]} '
-                f'{str_elem} in {color["YELLOW"]}{path}{color["END"]}\n\n'
-                ' Enter another folder name or (q)uit\n ')
-            folder = input(prpt)
-            full_path = os.path.join(path, folder)
+            prpt = (f'\n {str_infos["warning"]} {str_1} '
+                f'{color["YELLOW"]}{elem}{color["END"]} '
+                f'{str_2} in {color["YELLOW"]}{path}{color["END"]}\n\n'
+                ' Enter another name or (q)uit\n ')
+            elem = input(prpt)
+            full_path = os.path.join(path, elem)
+            wit = True # witnesses foldername entered by user had to be modified
         elif not condition(full_path):
+            if wit and mod_param is not None:
+                replacer = ["'" + elem + "'"]
+                pre_replacer = [mod_param[1]]
+                post_replacer = ['\n']
+                find_replace_in_file(mod_param[0], pre_replacer, post_replacer, replacer)
             break
-    return full_path, folder
+    return full_path
 
 
 def find_in_str(str_start, str_end, str_obj, reverse_find = False):
@@ -187,3 +215,35 @@ def get_outputs(file_log_out, file_log_err, subprocess_result):
     with open(file_log_err, "w", encoding="utf-8") as log_err:
         log_err.write(subprocess_result.stderr)
         log_err.close()
+
+
+        # Because of versions of open mpi (2.0.4) needed for compilation of XIOS,
+        # The xarray module can't be loaded with python 3.7.5.
+        #  So the 2 steps below:
+        # - Put sic in icemod as siconc in grid_t
+        # - Compute wocetr_eff and put it in grid_w
+        # are not used.
+        # Fix have been found by using older version of python (3.7.2)
+        # But compilation of XIOS and NEMO take around 25min instead of 5min
+
+        # Put sic in icemod as siconc in grid_t
+        #-----------------------------
+        # file_t = os.path.join(self.bc_path, FILE_PREFIX, FILE_PREFIX + '_grid_T.nc')
+        # file_icemod = os.path.join(self.bc_path, FILE_PREFIX, FILE_PREFIX + '_icemod.nc')
+        # ds_grid_t = xr.open_dataset(file_t)
+        # ds_icemod = xr.open_dataset(file_icemod)
+        # ds_grid_t['siconc'] = ds_icemod['sic']
+        # os.remove(file_t)
+        # ds_grid_t.to_netcdf(file_t)
+        #-----------------------------
+
+        # Compute wocetr_eff and put it in grid_w
+        #-----------------------------
+        # file_mesh = os.path.join(self.bc_path, FILE_PREFIX, MASK_FILE)
+        # ds_mesh = xr.open_dataset(file_mesh)
+        # file_w = os.path.join(self.bc_path, FILE_PREFIX, FILE_PREFIX + '_grid_W.nc')
+        # ds_grid_w = xr.open_dataset(file_w)
+        # ds_grid_w["wocetr_eff"] = ds_mesh["e1t"] * ds_mesh["e2t"] * np.nanmean(ds_grid_w["wo"],0)
+        # os.remove(file_w)
+        # ds_grid_w.to_netcdf(file_w)
+        #-----------------------------
