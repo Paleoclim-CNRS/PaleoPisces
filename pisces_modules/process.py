@@ -32,23 +32,26 @@ if not os.path.isfile(os.path.join(WORK_PATH, 'user_input', user, 'param.py')):
 # for varname in var_lst:
 #     exec(f"{varname} = getattr(sim_file, '{varname}')")
 
-param_file      = import_module(f'user_input.{user}.param')
-PISCES_FOLDER   = getattr(param_file, 'PALEOPISCES_FOLDER')
-BC_FOLDER       = getattr(param_file, 'BC_FOLDER')
-BC_EXP_FOLDER   = getattr(param_file, 'BC_EXP_FOLDER')
-SIM_OUTPUT_PATH = getattr(param_file, 'SIM_OUTPUT_PATH')
-FILE_PREFIX     = getattr(param_file, 'FILE_PREFIX')
-MASK_PATH       = getattr(param_file, 'MASK_PATH')
-MASK_FILE       = getattr(param_file, 'MASK_FILE')
-BATHY_PATH      = getattr(param_file, 'BATHY_PATH')
-BATHY_FILE      = getattr(param_file, 'BATHY_FILE')
-SUBBASIN_FILE   = getattr(param_file, 'SUBBASIN_FILE')
-MASK_BATHY_FILE = getattr(param_file, 'MASK_BATHY_FILE')
-JOB_NAME        = getattr(param_file, 'JOB_NAME')
-DATE_BEGIN      = getattr(param_file, 'DATE_BEGIN')
-DATE_END        = getattr(param_file, 'DATE_END')
-SPACE_NAME      = getattr(param_file, 'SPACE_NAME')
-
+param_module    = import_module(f'user_input.{user}.param')
+PISCES_FOLDER   = getattr(param_module, 'PALEOPISCES_FOLDER')
+BC_FOLDER       = getattr(param_module, 'BC_FOLDER')
+BC_EXP_FOLDER   = getattr(param_module, 'BC_EXP_FOLDER')
+SIM_OUTPUT_PATH = getattr(param_module, 'SIM_OUTPUT_PATH')
+FILE_PREFIX     = getattr(param_module, 'FILE_PREFIX')
+COORD_PATH      = getattr(param_module, 'COORD_PATH')
+COORD_FILE      = getattr(param_module, 'COORD_FILE')
+MASK_PATH       = getattr(param_module, 'MASK_PATH')
+MASK_FILE       = getattr(param_module, 'MASK_FILE')
+BATHY_PATH      = getattr(param_module, 'BATHY_PATH')
+BATHY_FILE      = getattr(param_module, 'BATHY_FILE')
+SUBBASIN_FILE   = getattr(param_module, 'SUBBASIN_FILE')
+MASK_BATHY_FILE = getattr(param_module, 'MASK_BATHY_FILE')
+SOLUBILITY_FILE = getattr(param_module, 'SOLUBILITY_FILE')
+PAR_FILE        = getattr(param_module, 'PAR_FILE')
+JOB_NAME        = getattr(param_module, 'JOB_NAME')
+DATE_BEGIN      = getattr(param_module, 'DATE_BEGIN')
+DATE_END        = getattr(param_module, 'DATE_END')
+SPACE_NAME      = getattr(param_module, 'SPACE_NAME')
 
 param_file = os.path.join(WORK_PATH, "user_input", user, 'param.py')
 param_var = {'pisces'   :'PALEOPISCES_FOLDER = ',
@@ -86,18 +89,25 @@ class PaleoPiscesInstaller():
 
         print(str_infos['paleopisces_title'])
 
-        prpt = (f' Enter path + folder name where PALEO PISCES will be installed:\n'
-                f' (From {color["YELLOW"]}{user_path}{color["END"]})\n ')
+        pisces_folder = PISCES_FOLDER
+
+        # If PISCES_FOLDER variable is empty, ask for a new folder to copy pisces to
+        if pisces_folder == '':
+            prpt = (f' Enter path + folder name where PALEO PISCES will be installed:\n'
+                    f' (From {color["YELLOW"]}{user_path}{color["END"]})\n ')
+            pisces_folder = input(prpt)
+            replacer = ["'" + pisces_folder + "'"]
+            pre_replacer = [param_var['pisces']]
+            post_replacer = ['\n']
+            find_replace_in_file(param_file, pre_replacer, post_replacer, replacer)
+
+        # Make sure folder for paleopisces model doesn't already exist
         self.pisces_path = path_checker(
             user_path,
-            input(prpt),
-            existence=True
+            pisces_folder,
+            existence=False,
+            mod_param=[param_file, param_var['pisces']]
         )
-
-        replacer = ["'" + self.pisces_path.split('/')[-1] + "'"]
-        pre_replacer = [param_var['pisces']]
-        post_replacer = ['\n']
-        find_replace_in_file(param_file, pre_replacer, post_replacer, replacer)
 
         print(str_infos["install_pisces"])
 
@@ -132,7 +142,7 @@ class PaleoPiscesConfigurator():
         self.pisces_path = path_checker(
             user_path,
             PISCES_FOLDER,
-            existence=False,
+            existence=True,
             mod_param=[param_file, param_var['pisces']]
         )
 
@@ -142,7 +152,7 @@ class PaleoPiscesConfigurator():
         self.bc_exp_path = path_checker(
             os.path.join(user_path, BC_FOLDER),
             BC_EXP_FOLDER,
-            existence=True,
+            existence=False,
             mod_param=[param_file, param_var['bc_exp']]
         )
         os.makedirs(self.bc_exp_path)
@@ -151,10 +161,14 @@ class PaleoPiscesConfigurator():
         self.msk_bathy = path_checker(
             self.bc_path,
             MASK_BATHY_FILE,
-            existence=True,
+            existence=False,
             isfile=True,
             mod_param=[param_file, param_var['msk_bathy']]
         ).split('/')[-1]
+
+        self.dim_y = os.popen(
+            f"ncdump -h {os.path.join(COORD_PATH, COORD_FILE)} | grep -i 'y = ' | cut -f 3 -d ' '"
+            ).read()[:-1]
 
         print(str_infos["set_up_bc"])
 
@@ -167,10 +181,10 @@ class PaleoPiscesConfigurator():
               end=" ", flush=True)
         # SYMLINKS
         os.symlink(
-            os.path.join(SOURCES_PATH, 'DATA', 'coordinates_paleorca2_yd.nc'),
-                os.path.join(self.bc_exp_path, 'coordinates_paleorca2_yd.nc')
+            os.path.join(COORD_PATH, COORD_FILE),
+            os.path.join(self.bc_exp_path, COORD_FILE)
         )
-        os.symlink(
+        shutil.copy2(
             os.path.join(MASK_PATH, MASK_FILE),
             os.path.join(self.bc_exp_path, MASK_FILE)
         )
@@ -344,9 +358,9 @@ class PaleoPiscesConfigurator():
                     ),
                 os.path.join(self.bc_path, 'WEIGHTS', 'data')
             )
-        if not os.path.isfile(os.path.join(self.bc_path, 'WEIGHTS', 'data', 'coordinates_paleorca2_yd.nc')):
+        if not os.path.isfile(os.path.join(self.bc_path, 'WEIGHTS', 'data', COORD_FILE)):
             shutil.copy2(
-                os.path.join(SOURCES_PATH, 'DATA', 'coordinates_paleorca2_yd.nc'),
+                os.path.join(COORD_PATH, COORD_FILE),
                 os.path.join(self.bc_path, 'WEIGHTS', 'data')
             )
 
@@ -361,6 +375,14 @@ class PaleoPiscesConfigurator():
                 os.path.join(SOURCES_PATH, 'NAMELIST', 'namelist_r144x96_paleorca2_bilin'),
                 os.path.join(self.bc_path, 'WEIGHTS', 'data')
             )
+
+        replacer = [COORD_FILE]
+        pre_replacer = ["    nemo_file = '"]
+        post_replacer = ["'\n"]
+        find_replace_in_file(os.path.join(self.bc_path, 'WEIGHTS', 'data', 'namelist_r144x143_paleorca2_bilin'),
+                             pre_replacer, post_replacer, replacer)
+        find_replace_in_file(os.path.join(self.bc_path, 'WEIGHTS', 'data', 'namelist_r144x96_paleorca2_bilin'),
+                             pre_replacer, post_replacer, replacer)
 
         # Creates weight files
         lst_err = []
@@ -449,9 +471,9 @@ class PaleoPiscesConfigurator():
             )
 
         # Modify create_coastline.f90
-        replacer = [BATHY_FILE, self.msk_bathy, self.msk_bathy]
-        pre_replacer = ['status = nf90_open("', 'status = nf90_create("', 'status = nf90_open("']
-        post_replacer = ['",nf90_nowrite,ncid1)', '",nf90_noclobber,ncid3)', '",nf90_write,ncid3)']
+        replacer = [self.dim_y, BATHY_FILE, self.msk_bathy, self.dim_y, self.msk_bathy]
+        pre_replacer = ['integer, parameter :: imax=182, jmax=', 'status = nf90_open("', 'status = nf90_create("', 'status = nf90_def_dim(ncid3,"y",', 'status = nf90_open("']
+        post_replacer = ['\n', '",nf90_nowrite,ncid1)', '",nf90_noclobber,ncid3)', ',ydimid)', '",nf90_write,ncid3)']
         find_replace_in_file(os.path.join(self.bc_path, 'create_coastline.f90'),
             pre_replacer, post_replacer, replacer)
 
@@ -509,7 +531,7 @@ class PaleoPiscesInitializer():
         self.pisces_path = path_checker(
             user_path,
             PISCES_FOLDER,
-            existence=False,
+            existence=True,
             mod_param=[param_file, param_var['pisces']]
         )
 
@@ -517,7 +539,7 @@ class PaleoPiscesInitializer():
         self.bc_path = path_checker(
             user_path,
             BC_FOLDER,
-            existence=False,
+            existence=True,
             mod_param=[param_file, param_var['bc']]
         )
 
@@ -525,7 +547,7 @@ class PaleoPiscesInitializer():
         self.bc_exp_path = path_checker(
             os.path.join(user_path, BC_FOLDER),
             BC_EXP_FOLDER,
-            existence=False,
+            existence=True,
             mod_param=[param_file, param_var['bc_exp']]
         )
 
@@ -533,11 +555,15 @@ class PaleoPiscesInitializer():
         self.job_name = path_checker(
             os.path.join(self.pisces_path, "modipsl", "config", "NEMO_v6"),
             JOB_NAME,
-            existence=True,
+            existence=False,
             mod_param=[param_file, param_var['job']]
         ).split('/')[-1]
 
         self.pnb = pnb
+
+        self.dim_y = os.popen(
+            f"ncdump -h {os.path.join(COORD_PATH, COORD_FILE)} | grep -i 'y = ' | cut -f 3 -d ' '"
+        ).read()[:-1]
 
         print(str_infos['init_sim'])
 
@@ -698,9 +724,12 @@ class PaleoPiscesInitializer():
             ', '.join([os.path.join(self.bc_path, 'WEIGHTS', 'data', 'weights_r144x96_paleorca2_bilinear.nc'), 'weights_2d_bilin.nc']),
             '${R_IN}/OCE/NEMO /${config_UserChoices_TagName}/${pisces_UserChoices_version}/Dust_inca_LOI/DUST_INCA_LOI6012-histAER_1M_1850.nc, dust.orca.nc',
             '${R_IN}/OCE/NEMO/${config_UserChoices_TagName}/${pisces_UserChoices_version}/Ndep_input4MIPs/Ndep_input4MIPs_surfaceFluxes_CMIP_NCAR-CCMI-2-0_gn_185001-185012-clim.nc, ndeposition.orca.nc',
-            '${R_IN}/OCE/NEMO/${config_UserChoices_TagName}/${pisces_UserChoices_version}/par_fraction_gewex_orca_r2_clim90s00s.nc, par.orca.nc',
-            '/ccc/work/cont003/gen2212/laugiema/BC_PISCES_OFFLINE/PALEOPISCES-TOOLS/FILES/novolcdust.nc, volcdust.nc',
-            '/ccc/work/cont003/gen2212/laugiema/BC_PISCES_OFFLINE/PALEOPISCES-TOOLS/FILES/Paleosolubility1_T62-ORCA2_Mahowald.nc, solubility.orca.nc'
+            # '${R_IN}/OCE/NEMO/${config_UserChoices_TagName}/${pisces_UserChoices_version}/par_fraction_gewex_orca_r2_clim90s00s.nc, par.orca.nc',
+            ', '.join([os.path.join(SOURCES_PATH, 'DATA', PAR_FILE), 'par.orca.nc']),
+            # '/ccc/work/cont003/gen2212/laugiema/BC_PISCES_OFFLINE/PALEOPISCES-TOOLS/FILES/novolcdust.nc, volcdust.nc',
+            ', '.join([os.path.join(SOURCES_PATH, 'DATA', 'novolcdust.nc'), 'volcdust.nc']),
+            # '/ccc/work/cont003/gen2212/laugiema/BC_PISCES_OFFLINE/PALEOPISCES-TOOLS/FILES/Paleosolubility1_T62-ORCA2_Mahowald.nc, solubility.orca.nc'
+            ', '.join([os.path.join(SOURCES_PATH, 'DATA', SOLUBILITY_FILE), 'solubility.orca.nc'])
         ]
 
         str_tot  = '), \\\n            ('.join(lst)
@@ -753,6 +782,17 @@ class PaleoPiscesInitializer():
         shutil.copy2(
             os.path.join(SOURCES_PATH, 'NAMELIST', 'namelist_top_cfg'),
             os.path.join(self.pisces_path, 'modipsl', 'config', 'NEMO_v6', self.job_name, 'PARAM', 'NAMELIST', 'ORCA2')
+        )
+
+        replacer = [self.dim_y, self.dim_y]
+        pre_replacer = ['   jpjdta      =     ', '   jpjglo      =     ']
+        post_replacer = [
+            '               !  2nd    "         "    ( >= jpj )',
+            '               !  2nd    -                  -    --> j  =jpjdta'
+            ]
+        find_replace_in_file(
+            os.path.join(self.pisces_path, 'modipsl', 'config', 'NEMO_v6', self.job_name, 'PARAM', 'NAMELIST', 'ORCA2', 'namelist_offline_clim_cfg'),
+            pre_replacer, post_replacer, replacer
         )
 
         print(str_infos['done'])
