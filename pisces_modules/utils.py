@@ -73,22 +73,22 @@ def path_checker(path, elem, existence=True, isfile=False, mod_param=None):
     """
     Prompts WARNING if path/folder or path/file already exists or not depending on 
     - existence flag
-        If existence = True: warning will be displayed if folder already exists
-        If existence = False: warning will be displayed if folder doesn't exist
+        If existence = True: warning will be displayed if folder doesn't exist
+        If existence = False: warning will be displayed if folder already exists
     - isfile flag
         If isfile = True: function will check for path/file
         If isfile = False: function will check for path/folder
     If warnnig is displayed, user will be prompted to enter another folder/file name or quit
-    mod_param should be defined in list of 2 elements:
-        - Path to the param file to correct
-        - Variable to modify (under format 'var = ')
     If mod_param is defined, variable (mod_param[1]) in param file (mod_param[0]) will be
-    modified with the right folder name choosen by user
+    modified with the right folder name choosen by user in case warnning is displayed
+        mod_param should be defined in list of 2 elements:
+        - Path to the param file to correct if warning is encountered
+        - Variable to modify (under format 'var = ')
     """
     if elem == '':
         elem = '__Null__'
     full_path = os.path.join(path, elem)
-    if existence:
+    if not existence:
         def condition(path):
             if not isfile:
                 return os.path.isdir(path)
