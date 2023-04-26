@@ -86,7 +86,7 @@ def path_checker(path, elem, existence=True, isfile=False, mod_param=None):
         - Variable to modify (under format 'var = ')
     """
     if elem == '':
-        elem = '__Null__'
+        elem = 'PALEO_PISCES'
     full_path = os.path.join(path, elem)
     if not existence:
         def condition(path):
